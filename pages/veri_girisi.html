@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Ahmet Zafer Demir">
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/table.css">
+
+    <style>
+        label {
+            color: white;
+            font-weight: bold;
+            display: block;
+        }
+
+        input {
+            border-left-width: 10px;
+            border-left-color: purple;
+            border-radius: 5px;
+            padding: 5px;
+            font-weight: bolder;
+        }
+
+        button {
+            padding: 5px;
+            margin: 30px 0px 0px 0px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            color: purple;
+        }
+
+        .form-container {
+            display: flex;
+            background-color: rgba(34, 34, 34, 0.2);
+            backdrop-filter: blur(100px);
+            justify-content: center;
+            justify-content: space-around;
+            padding: 15px;
+            border-radius: 25px;
+        }
+
+        .table-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-around;
+            gap: 25px;
+            background-color: rgba(34, 34, 34, 0.2);
+            backdrop-filter: blur(100px);
+            padding: 15px;
+            border-radius: 25px;
+        }
+    </style>
+
+    <title>Tarla Yönetimi Portalı</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav>
+            <div class="profil">
+                <div class="profil-resmi">
+                    <img src="/static/images/ben.jpg" alt="Ahmet Zafer Demir" title="Ahmet Zafer Demir">
+                    <span>Ahmet Zafer Demir</span>
+                </div>
+            </div>
+
+            <div class="linkler">
+                <ul>
+                    <li><a href="iklim_hava_kosullari">İklim / Hava Koşulları</a></li>
+                    <li><a href="urun_toprak_bilgileri">Ürün / Toprak Tipi Bilgileri</a></li>
+                    <li><a href="grafikler">Grafikler</a></li>
+                    <li><a href="uretim_satis_verileri">Üretim / Satış Verileri</a></li>
+                    <li><a href="veri_girisi">Veri Girişi</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <article class="icerik" id="urun-toprak-sayfasi-icerik">
+            <h1>Veri Girişi</h1>
+
+            <div class="form-container">
+
+                <form class="add_farm_form">
+                    <h2>Yeni Tarla Girişi</h2>
+                    <div class="tarla_veri_giris_div">
+                        <div class="tarla_id tarla_giris_item">
+                            <label for="tarla_id">Tarla ID</label>
+                            <input type="number" name="tarla_id" id="tarla_id">
+                        </div>
+
+                        <div class="urun_id tarla_giris_item">
+                            <label for="urun_id">Ürün ID</label>
+                            <input type="number" name="urun_id" id="urun_id">
+                        </div>
+
+                        <div class="tarla_m2 tarla_giris_item">
+                            <label for="tarla_m2">Tarla m2</label>
+                            <input type="number" name="tarla_m2" id="tarla_m2">
+                        </div>
+
+                        <div class="toprak_tip_id tarla_giris_item">
+                            <label for="toprak_tip_id">Toprak Tipi ID</label>
+                            <input type="number" name="toprak_tip_id" id="toprak_tip_id">
+                        </div>
+                    </div>
+
+                    <button>Ekle</button>
+
+                </form>
+
+                <form class="add_product_form">
+                    <h2>Yeni Ürün Girişi</h2>
+                    <div class="urun_veri_giris_div">
+                        <div class="urun_id urun_giris_item">
+                            <label for="urun_id">Ürün ID</label>
+                            <input type="number" name="urun_id" id="urun_id">
+                        </div>
+
+                        <div class="urun_ad urun_giris_item">
+                            <label for="urun_ad">Ürün Ad</label>
+                            <input type="text" name="urun_ad" id="urun_ad">
+                        </div>
+
+                    </div>
+
+                    <button>Ekle</button>
+
+                </form>
+
+
+            </div>
+
+            <div class="table-container">
+
+                <table class="data-table farmer-table">
+                    <thead>
+                        <tr>
+                            <th>Tarla_id</th>
+                            <th>Ürün_id</th>
+                            <th>Tarla m^2</th>
+                            <th>Toprak tip id</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 id</td>
+                            <td>2 id</td>
+                            <td>3 id</td>
+                            <td>4 id</td>
+                        </tr>
+                        <tr>
+                            <td>1 id</td>
+                            <td>2 id</td>
+                            <td>3 id</td>
+                            <td>4 id</td>
+                        </tr>
+                        <tr>
+                            <td>1 id</td>
+                            <td>2 id</td>
+                            <td>3 id</td>
+                            <td>4 id</td>
+                        </tr>
+                        <tr>
+                            <td>1 id</td>
+                            <td>2 id</td>
+                            <td>3 id</td>
+                            <td>4 id</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="data-table product-table">
+                    <thead>
+                        <tr>
+                            <th>Ürün ID</th>
+                            <th>Ürün Adı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 id</td>
+                            <td>2 ürün</td>
+                        </tr>
+                        <tr>
+                            <td>2 id</td>
+                            <td>2 ürün</td>
+                        </tr>
+                        <tr>
+                            <td>3 id</td>
+                            <td>3 ürün</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </article>
+
+
+
+    </div>
+
+</body>
+
+</html>
