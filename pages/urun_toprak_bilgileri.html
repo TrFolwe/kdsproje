@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Ahmet Zafer Demir">
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/table.css">
+
+    <title>Tarla Yönetimi Portalı</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav>
+            <div class="profil">
+                <div class="profil-resmi">
+                    <img src="/static/images/ben.jpg" alt="Ahmet Zafer Demir" title="Ahmet Zafer Demir">
+                    <span>Ahmet Zafer Demir</span>
+                </div>
+            </div>
+            <div class="linkler">
+                <ul>
+                    <li><a href="iklim_hava_kosullari">İklim / Hava Koşulları</a></li>
+                    <li><a href="urun_toprak_bilgileri">Ürün / Toprak Tipi Bilgileri</a></li>
+                    <li><a href="grafikler">Grafikler</a></li>
+                    <li><a href="uretim_satis_verileri">Üretim / Satış Verileri</a></li>
+                    <li><a href="veri_girisi">Veri Girişi</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <article class="icerik" id="urun-toprak-sayfasi-icerik">
+            <h1>Ürün Bilgileri</h1>
+
+
+        </article>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <script>
+
+        const wait = ms => new Promise(r => setTimeout(r, ms));
+        (async () => {
+            const tableJson = (await $.ajax({
+                url: "http://localhost:3000/urun_toprak_verileri"
+            }));
+
+            function tableRender() {
+                return new Promise(async r => {
+                    const table = document.querySelector("table.data-table");
+
+                    if (tableJson.error) {
+                        table.innerHTML = `<h2>${tableJson.message}</h2>`
+                        return
+                    };
+                    tableJson.forEach(values => {
+                        const { tarla_id, urun_id, tarla_m2, toprak_tip_id } = values;
+                        table.querySelector("tbody").innerHTML += `<tr>
+    <td>${tarla_id}</td>
+    <td>${urun_id}</td>
+    <td>${tarla_m2}</td>
+    <td>${toprak_tip_id}</td>
+    </tr>`;
+                    });
+
+                    r();
+                })
+            }
+            await tableRender();
+        })();
+
+    </script>
+
+</body>
+
+</html>
