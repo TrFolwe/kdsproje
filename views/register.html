@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="/static/css/register.css">
+
+    <title>Tarla Yönetimi Kullanıcı Kayıt Ekranı</title>
+</head>
+
+<body>
+    <header>
+        <h1>Tarla Yönetimi <br>Kullanıcı Kayıt Ekranı</h1>
+        <div class="kullanicigirislinkleri">
+            <a href="/login">Giriş Yap / Log In</a>
+            <span id="linkspan">veya</span>
+            <a href="/register">Kayıt ol / Sign Up</a>
+        </div>
+    </header>
+
+    <main>
+
+
+        <div class="kayit-form">
+            <form onsubmit="return false;" class="register-form">
+
+                <div id="ad-sec">
+                    <label for="ad-sec-input">Adınız</label>
+                    <input type="text" id="ad-sec-input" name="name" required>
+                </div>
+
+                <div id="soyad-sec">
+                    <label for="soyad-sec-input">Soyadınız</label>
+                    <input type="text" id="soyad-sec-input" name="surname" required>
+                </div>
+
+
+                <div id="email-sec">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" placeholder="exp@exp.com">
+                </div>
+
+                <div id="kullanici-adi-sec">
+                    <label for="kullanici-ad-sec-input">Kullanıcı Adı</label>
+                    <input type="text" id="kullanici-ad-sec-input" name="username" required
+                        placeholder="Kullanmak İstediğiniz Kullanıcı Adını Giriniz">
+                </div>
+
+                <div id="sifre-sec">
+                    <label for="sifre-sec-input">Şifre</label>
+                    <input type="password" id="sifre-sec-input" name="password" required
+                        placeholder="Güçlü Bir Şifre Giriniz">
+                </div>
+                <button type="submit">Kayıt Ol</button>
+            </form>
+            <div id="butonlar">
+                <span>veya zaten bir hesabın varsa</span>
+                <input onclick="location.replace('/login')" type="submit" id="gonder" name="gonder" value="Giriş Yap">
+            </div>
+        </div>
+    </main>
+
+    <footer><span>Bütün Hakları Saklıdır.</span></footer>
+
+    <script>
+
+        const getFormData = formData => {
+            const json = {};
+            for (data of formData.entries()) json[data[0]] = data[1];
+            return json;
+        }
+
+        const wait = ms => new Promise(rs => setTimeout(rs, ms));
+
+        document.querySelector(".register-form").addEventListener("submit", async e => {
+            const formData = getFormData(new FormData(e.target));
+
+            const response = await fetch("http://localhost:3000/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+
+            const json = await response.json();
+
+            if (json?.err) return alert(json.message);
+
+            alert(json.message);
+
+            window.location.replace("/login")
+
+            e.preventDefault();
+        })
+    </script>
+</body>
+
+</html>

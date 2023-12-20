@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Ahmet Zafer Demir">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/table.css">
+
+    <style>
+        label {
+            color: white;
+            font-weight: bold;
+            display: block;
+        }
+
+        input {
+            border-left-width: 10px;
+            border-left-color: purple;
+            border-radius: 5px;
+            padding: 5px;
+            font-weight: bolder;
+        }
+
+        button {
+            padding: 5px;
+            margin: 30px 0px 0px 0px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            color: purple;
+        }
+
+        .form-container {
+            display: flex;
+            background-color: rgba(34, 34, 34, 0.2);
+            backdrop-filter: blur(100px);
+            justify-content: center;
+            justify-content: space-around;
+            padding: 15px;
+            border-radius: 25px;
+        }
+
+        .table-container {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            gap: 25px;
+            background-color: rgba(34, 34, 34, 0.2);
+            backdrop-filter: blur(100px);
+            padding: 15px;
+            border-radius: 25px;
+        }
+
+        .tarla_giris_item {
+            margin-top: 10px;
+        }
+
+        .urun_giris_item {
+            margin-top: 10px;
+        }
+    </style>
+
+    <title>Tarla Yönetimi Portalı</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <%- include('../components/UserNavbar.ejs') %>
+
+            <article class="icerik" id="urun-toprak-sayfasi-icerik">
+                <h1>Veri Girişi</h1>
+
+                <div class="form-container">
+
+                    <form class="farm_form" onsubmit="return false;">
+                        <h2>Yeni Tarla Girişi</h2>
+                        <div class="tarla_veri_giris_div">
+                            <div class="tarla_m2 tarla_giris_item">
+                                <label for="tarla_m2">Tarla m2</label>
+                                <input required type="number" name="tarla_m2" id="tarla_m2">
+                            </div>
+
+                            <div class="urun_id tarla_giris_item">
+                                <label for="tarla_m2">Ürün ID</label>
+                                <input required type="number" name="product_id" id="product_id">
+                            </div>
+
+                            <div class="toprak_tip_id tarla_giris_item">
+                                <label for="toprak_tip_id">Toprak Tipi ID</label>
+                                <input required type="number" name="toprak_tip_id" id="toprak_tip_id">
+                            </div>
+                        </div>
+
+                        <button type="submit">Ekle</button>
+
+                    </form>
+
+                    <form class="product_form" onsubmit="return false;">
+                        <h2>Yeni Ürün Girişi</h2>
+                        <div class="urun_veri_giris_div">
+
+                            <div class="urun_ad urun_giris_item">
+                                <label for="urun_ad">Ürün Ad</label>
+                                <input required type="text" name="urun_ad" id="urun_ad">
+                            </div>
+
+                        </div>
+
+                        <button type="submit">Ekle</button>
+
+                    </form>
+
+
+                </div>
+
+                <div class="table-container">
+
+                    <table class="data-table farmer-table">
+                        <thead>
+                            <tr>
+                                <th>Tarla ID</th>
+                                <th>Ürün ID</th>
+                                <th>Tarla m2</th>
+                                <th>Toprak Tipi ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                    <table class="data-table product-table">
+                        <thead>
+                            <tr>
+                                <th>Ürün ID</th>
+                                <th>Ürün Adı</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </article>
+    </div>
+
+    <script>
+        (async () => {
+            const farmJson = await (await fetch("http://localhost:3000/veriler?type=farm")).json();
+            const productJson = await (await fetch("http://localhost:3000/veriler?type=product")).json();
+            farmJson.forEach(farmData => {
+                const { tarla_id, urun_id, tarla_m2, toprak_tip_id } = farmData;
+
+                const farmTableTbody = document.querySelector(".farmer-table tbody");
+
+                farmTableTbody.innerHTML += `<tr>
+                    <td>${tarla_id}</td>    
+                    <td>${urun_id}</td>   
+                    <td>${tarla_m2}</td>   
+                    <td>${toprak_tip_id}</td>   
+                </tr>`;
+            });
+
+            productJson.forEach(productData => {
+                const { urun_id, urun_ad } = productData;
+
+                const productTableTbody = document.querySelector(".product-table tbody");
+
+                productTableTbody.innerHTML += `<tr>
+                    <td>${urun_id}</td>
+                    <td>${urun_ad}</td>
+                </tr>`;
+            });
+        })();
+
+        const farmForm = document.querySelector("form.farm_form"), productForm = document.querySelector("form.product_form");
+
+        const getFormData = formData => {
+            const json = {};
+            for (data of formData.entries()) json[data[0]] = data[1];
+            return json;
+        }
+
+        farmForm.addEventListener("submit", async e => {
+            e.preventDefault();
+            const formData = getFormData(new FormData(e.target));
+            const response = await fetch("http://localhost:3000/tarla_ekle", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const responseJson = await response.json();
+
+            if (!responseJson?.error) {
+                alert(responseJson.message);
+                location.reload();
+            }
+        })
+
+        productForm.addEventListener("submit", async e => {
+            e.preventDefault();
+            const formData = getFormData(new FormData(e.target));
+            const response = await fetch("http://localhost:3000/urun_ekle", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const responseJson = await response.json();
+
+            if (!responseJson?.error) {
+                alert(responseJson.message);
+                location.reload();
+            }
+        })
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <title>Tarla Yönetimi Giriş Ekranı</title>
+</head>
+
+<body>
+    <header>
+        <h1>Tarla Yönetimi <br> Kullanıcı Giriş Ekranı</h1>
+        <div class="kullanicigirislinkleri">
+            <a href="/login">Giriş Yap / Log In</a>
+            <span id="linkspan">veya</span>
+            <a href="/register">Kayıt ol / Sign Up</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="giris-form">
+            <form onsubmit="return false;" class="login-form">
+                <div id="kullanici-adi">
+                    <label for="kullanici-ad">Kullanıcı Adı</label>
+                    <input type="text" id="kullanici-ad" name="username" required>
+                </div>
+
+                <div id="sifre">
+                    <label for="sifre">Şifre</label>
+                    <input type="password" id="sifre" name="password" required>
+                </div>
+                <div id="beni-hatirla">
+                    <label for="benihatirla"><small><b>Beni Hatırla</b></small></label>
+                    <input type="checkbox" id="benihatirla" name="isForgetMe">
+                </div>
+                <div id="butonlar">
+                    <button type="submit" id="gonder">Giriş Yap</button>
+                </div>
+            </form>
+            <span style="text-align: center;">veya</span>
+            <input onclick="location.replace('/register')" type="button" id="kayit-ol" value="Kayıt Ol">
+        </div>
+    </main>
+
+    <footer><span>Bütün Hakları Saklıdır.</span></footer>
+
+    <script>
+        const getFormData = formData => {
+            const json = {};
+            for (data of formData.entries()) json[data[0]] = data[1];
+            return json;
+        }
+
+        document.querySelector(".login-form").addEventListener("submit", async e => {
+            const formData = getFormData(new FormData(e.target));
+
+            const response = await fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const json = await response.json();
+
+            if (json?.error) return alert(json.message);
+
+            location.reload()
+
+            e.preventDefault();
+        })
+    </script>
+</body>
+
+</html>

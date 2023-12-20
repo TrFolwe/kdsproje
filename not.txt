@@ -1,0 +1,3 @@
+Tarla tablosu
+
+Taşlı Toprak Tipi (id 4) bazı veriler yok ürün ekilmedi

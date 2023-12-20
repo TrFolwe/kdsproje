@@ -1,0 +1,126 @@
+/*GİRİŞ EKRANI*/
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: Montserrat, sans-serif, serif;
+}
+
+body {
+    background-color: rgb(227, 227, 227);
+    width: 100%;
+    min-height: 800px;
+    border: solid 1px black;
+}
+
+header {
+    background-color: white;
+    border-bottom: solid 1px black;
+    width: 100%;
+    height: 120px;
+    position: fixed;
+    top: 0px;
+}
+
+header h1 {
+    float: left;
+    position: relative;
+    top: 18px;
+    left: 30px;
+    color: purple;
+}
+
+.kullanicigirislinkleri {
+    float: right;
+    position: relative;
+    top: 10px;
+    right: 40px;
+    text-align: center;
+}
+
+#linkspan {
+    font-weight: bold;
+}
+
+.kullanicigirislinkleri a {
+    display: block;
+    color: purple;
+    text-decoration: none;
+    font-weight: 900;
+    padding: 10px;
+}
+
+.kullanicigirislinkleri a:hover {
+    color: grey;
+}
+
+.giris-form {
+    background-color: white;
+    border: black solid 1px;
+    border-radius: 25px;
+    box-shadow: 10px 10px 20px black;
+    font-weight: bold;
+    padding: 50px;
+    margin: auto;
+    margin-top: 200px;
+    width: 600px;
+    height: 400px;
+}
+
+.giris-form input[type=text],
+.giris-form input[type=password] {
+    display: block;
+    width: 500px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: purple;
+    box-shadow: 2px 2px 5px inset;
+    color: white;
+    font-size: large;
+    font-weight: 900;
+    margin: 10px 0px 20px 0px
+}
+
+#butonlar {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.giris-form button[type=submit],
+.giris-form input[type=button] {
+    display: inline-block;
+    width: 100%;
+    height: 25px;
+    margin: 5px 0px 5px 0px;
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 16px;
+    color: black;
+}
+
+.giris-form button[type="submit"] {
+    cursor: pointer;
+}
+
+.giris-form button[type=submit]:hover,
+.giris-form button[type=button]:hover {
+
+    color: purple;
+}
+
+footer {
+    background-color: white;
+    border-top: solid 1px black;
+    text-align: center;
+    font-size: small;
+    font-weight: bolder;
+    width: 100%;
+    height: 50px;
+    position: fixed;
+    display: grid;
+    place-items: center;
+    bottom: 0;
+    left: 0;
+}
