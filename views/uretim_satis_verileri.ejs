@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Ahmet Zafer Demir">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/table.css">
+
+    <style>
+        .table-container {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            text-align: center;
+        }
+    </style>
+
+    <title>Tarla Yönetimi Portalı</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <%- include('../components/UserNavbar.ejs') %>
+
+            <article class="icerik" id="urun-toprak-sayfasi-icerik">
+                <h1>Üretim Verileri, Satış Verileri</h1>
+
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <h3>Ürün Satış Miktarı</h3>
+                        <table class="data-table product-sell-count">
+                            <thead>
+                                <tr>
+                                    <th>Ürün ID</th>
+                                    <th>Yıl</th>
+                                    <th>Mayıs</th>
+                                    <th>Haziran</th>
+                                    <th>Temmuz</th>
+                                    <th>Ağustos</th>
+                                    <th>Eylül</th>
+                                    <th>Ekim</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <h3>Ürün Üretim Miktarı</h3>
+                        <table class="data-table product-sell-production">
+                            <thead>
+                                <tr>
+                                <tr>
+                                    <th>Ürün ID</th>
+                                    <th>Yıl</th>
+                                    <th>Mayıs</th>
+                                    <th>Haziran</th>
+                                    <th>Temmuz</th>
+                                    <th>Ağustos</th>
+                                    <th>Eylül</th>
+                                    <th>Ekim</th>
+                                </tr>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </article>
+
+    </div>
+
+
+    <script>
+        (async () => {
+            const SellCountBody = document.querySelector("table.product-sell-count tbody"),
+                tSellProductionBody = document.querySelector("table.product-sell-production tbody");
+
+            const sellData = await (await fetch("http://localhost:3000/veriler?type=product_sell")).json(),
+                productionData = await (await fetch("http://localhost:3000/veriler?type=product_production")).json();
+
+            sellData.forEach(sData => {
+                const { urun_id, yillar, mayis, haziran, temmuz, agustos, eylul, ekim } = sData;
+
+                SellCountBody.innerHTML += `<tr>
+                    <td>${urun_id}</td>    
+                    <td>${yillar}</td>   
+                    <td>${mayis}</td>   
+                    <td>${haziran}</td>
+                    <td>${temmuz}</td> 
+                    <td>${agustos}</td> 
+                    <td>${eylul}</td> 
+                    <td>${ekim}</td> 
+                </tr>`;
+            });
+
+            productionData.forEach(sData => {
+                const { urun_id, yillar, mayis, haziran, temmuz, agustos, eylul, ekim } = sData;
+
+                tSellProductionBody.innerHTML += `<tr>
+                    <td>${urun_id}</td>    
+                    <td>${yillar}</td>   
+                    <td>${mayis}</td>   
+                    <td>${haziran}</td>
+                    <td>${temmuz}</td> 
+                    <td>${agustos}</td> 
+                    <td>${eylul}</td> 
+                    <td>${ekim}</td> 
+                </tr>`;
+            });
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Ahmet Zafer Demir">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <title>Tarla Yönetimi Portalı</title>
+</head>
+
+<body>
+    <div class="container">
+        <%- include('../components/UserNavbar.ejs') %>
+
+            <article class="icerik" id="urun-toprak-sayfasi-icerik">
+                <h1>Grafikler</h1>
+            </article>
+
+    </div>
+
+    <script>
+        const urunler = [
+            {
+                urunAdi: "Buğday",
+                aciklama: "---"
+            }
+            ,
+            {
+                urunAdi: "Arpa",
+                aciklama: "---"
+            }
+            ,
+            {
+                urunAdi: "Domates",
+                aciklama: "---"
+            }
+        ]
+    </script>
+
+</body>
+
+</html>
