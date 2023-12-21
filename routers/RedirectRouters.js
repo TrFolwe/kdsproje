@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const { database, getProductById } = require("../database/MySQLDatabase")
+const { database, getProductById, getGraphicsBoxDataAll } = require("../database/MySQLDatabase")
 
 const isAuthMiddleware = (req, res, next) => {
     if (!req.session.isAuthenticated) return res.redirect("/login");
@@ -28,13 +28,14 @@ router.get("/urun_toprak_bilgileri", isAuthMiddleware, (req, res) => {
     res.render("urun_toprak_bilgileri", { user: req.session.user });
 });
 
-router.get("/grafikler", isAuthMiddleware, (req, res) => {
-    res.render("grafikler", { user: req.session.user });
+router.get("/grafikler", isAuthMiddleware, async (req, res) => {
+    const graphicsData = await getGraphicsBoxDataAll();
+    res.render("grafikler", { user: req.session.user, graphicsData });
 });
 
 router.get("/veriler", (req, res) => {
     const { type } = req.query;
-    database.getConnection((err, connection) => {
+    database.getConnection(async (err, connection) => {
         if (err) throw err;
         switch (type) {
             case "farm":
@@ -56,13 +57,6 @@ router.get("/veriler", (req, res) => {
             //Satış verileri
             case "product_sell":
                 connection.query(`SELECT * FROM satis_miktari`, async (err, result) => {
-                    res.json(result);
-                    connection.destroy();
-                })
-                break;
-            //Üretim verileri
-            case "product_production":
-                connection.query(`SELECT * FROM uretim_miktari`, (err, result) => {
                     res.json(result);
                     connection.destroy();
                 })

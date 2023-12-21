@@ -11,6 +11,58 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
     <link rel="stylesheet" href="/static/css/style.css">
 
+    <style>
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 0;
+            gap: 15px;
+            position: relative;
+        }
+
+        .dashboard-box-wrapper {
+            display: flex;
+            gap: 15px;
+        }
+
+        .dashboard-box-wrapper .dashboard-box {
+            color: black;
+            background-color: dodgerblue;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .dashboard-box-wrapper .dashboard-box .box-nav {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 5px;
+            background-color: whitesmoke;
+            border-bottom-left-radius: inherit;
+            border-bottom-right-radius: inherit;
+        }
+
+        .dashboard-container>canvas {
+            width: 100%;
+            height: 250px;
+            border-radius: 15px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            gap: 10px;
+            background-color: #2a2a2a;
+            padding: 15px;
+            flex-wrap: wrap;
+        }
+    </style>
     <title>Tarla Yönetimi Portalı</title>
 </head>
 
@@ -20,27 +72,107 @@
 
             <article class="icerik" id="urun-toprak-sayfasi-icerik">
                 <h1>Grafikler</h1>
+
+                <div class="dashboard-container">
+                    <div class="dashboard-box-wrapper">
+                        <div class="dashboard-box">
+                            <h2>
+                                <%= graphicsData.tarla_sayisi %>
+                            </h2>
+                            <h4>Toplam Tarla Sayısı</h4>
+                            <nav class="box-nav"></nav>
+                        </div>
+                        <div class="dashboard-box">
+                            <h2>
+                                <%= graphicsData.urun_sayisi %>
+                            </h2>
+                            <h4>Toplam Ürün Sayısı</h4>
+                            <nav class="box-nav"></nav>
+                        </div>
+                        <div class="dashboard-box">
+                            <h2>
+                                <%= graphicsData.bugday_uretim_miktari %>
+                            </h2>
+                            <h4>Toplam Buğday Üretim Sayısı</h4>
+                            <nav class="box-nav"></nav>
+                        </div>
+                        <div class="dashboard-box">
+                            <h2>
+                                <%= graphicsData.arpa_uretim_miktari %>
+                            </h2>
+                            <h4>Toplam Arpa Üretim Sayısı</h4>
+                            <nav class="box-nav"></nav>
+                        </div>
+                        <div class="dashboard-box">
+                            <h2>
+                                <%=graphicsData.domates_uretim_miktari%>
+                            </h2>
+                            <h4>Toplam Domates Üretim Sayısı</h4>
+                            <nav class="box-nav"></nav>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas class="doughnut"></canvas>
+                        <canvas class="bar"></canvas>
+                        <canvas class="bar2"></canvas>
+                        <canvas class="bar3"></canvas>
+                        <canvas class="doughnut"></canvas>
+                        <canvas class="doughnut"></canvas>
+                        <canvas class="doughnut"></canvas>
+                    </div>
+                </div>
             </article>
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const urunler = [
-            {
-                urunAdi: "Buğday",
-                aciklama: "---"
-            }
-            ,
-            {
-                urunAdi: "Arpa",
-                aciklama: "---"
-            }
-            ,
-            {
-                urunAdi: "Domates",
-                aciklama: "---"
-            }
-        ]
+        const CHART_COLORS = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+        Chart.defaults.color = '#fff';
+        const doughnutGraphicCanvas = document.querySelector("canvas.doughnut");
+
+        const data = {
+            labels: ['Buğday', 'Arpa', 'Domates'],
+            datasets: [
+                {
+                    label: 'Miktar',
+                    data: [1, 2, 3],
+                    backgroundColor: Object.values(CHART_COLORS),
+                }
+            ]
+        };
+
+        const config = {
+            type: 'doughnut',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Chart.js Doughnut Chart'
+                    }
+                }
+            },
+        };
+
+        const chart = new Chart(doughnutGraphicCanvas, config);
+
+        Array.from(document.querySelectorAll(".dashboard-box")).forEach(box => {
+            box.style.backgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`
+        })
+
     </script>
 
 </body>
