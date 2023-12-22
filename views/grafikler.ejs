@@ -18,7 +18,10 @@
             padding: 10px 0;
             gap: 15px;
             position: relative;
+            margin-top: 30px;
         }
+
+
 
         .dashboard-box-wrapper {
             display: flex;
@@ -33,6 +36,11 @@
             position: relative;
             padding: 15px;
             border-radius: 10px;
+        }
+
+        .dashboard-box h2 {
+            font-weight: bolder;
+            font-size: 40px;
         }
 
         .dashboard-box-wrapper .dashboard-box .box-nav {
@@ -54,13 +62,21 @@
 
         .chart-container {
             position: relative;
-            width: 500px;
+            width: 100%;
             height: 500px;
             display: flex;
             gap: 10px;
             background-color: #2a2a2a;
             padding: 15px;
             flex-wrap: wrap;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .chart-container canvas {
+            margin: auto;
+            width: 100%;
+            height: 500px;
         }
     </style>
     <title>Tarla Yönetimi Portalı</title>
@@ -111,15 +127,31 @@
                             <nav class="box-nav"></nav>
                         </div>
                     </div>
+
                     <div class="chart-container">
-                        <canvas class="doughnut"></canvas>
-                        <canvas class="bar"></canvas>
-                        <canvas class="bar2"></canvas>
-                        <canvas class="bar3"></canvas>
-                        <canvas class="doughnut"></canvas>
-                        <canvas class="doughnut"></canvas>
-                        <canvas class="doughnut"></canvas>
+                        <canvas class="doughnut1"></canvas>
                     </div>
+                    <div class="chart-container">
+                        <canvas class="bar1"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas class="bar2"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas class="bar3"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas class="line1"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas class="line2"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas class="line3"></canvas>
+                    </div>
+
+
+
                 </div>
             </article>
 
@@ -127,52 +159,270 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const CHART_COLORS = {
-            red: 'rgb(255, 99, 132)',
-            orange: 'rgb(255, 159, 64)',
-            yellow: 'rgb(255, 205, 86)',
-            green: 'rgb(75, 192, 192)',
-            blue: 'rgb(54, 162, 235)',
-            purple: 'rgb(153, 102, 255)',
-            grey: 'rgb(201, 203, 207)'
-        };
-        Chart.defaults.color = '#fff';
-        const doughnutGraphicCanvas = document.querySelector("canvas.doughnut");
+        (async () => {
+            const chartsData = await (await fetch("http://localhost:3000/veriler?type=charts_data")).json();
+            const CHART_COLORS = {
+                red: 'rgb(255, 99, 132)',
+                orange: 'rgb(255, 159, 64)',
+                yellow: 'rgb(255, 205, 86)',
+                green: 'rgb(75, 192, 192)',
+                blue: 'rgb(54, 162, 235)',
+                purple: 'rgb(153, 102, 255)',
+                grey: 'rgb(201, 203, 207)'
+            };
+            Chart.defaults.color = '#fff';
 
-        const data = {
-            labels: ['Buğday', 'Arpa', 'Domates'],
-            datasets: [
-                {
-                    label: 'Miktar',
-                    data: [1, 2, 3],
-                    backgroundColor: Object.values(CHART_COLORS),
-                }
-            ]
-        };
+            const doughnutGraphicCanvases = document.querySelectorAll("canvas.doughnut1");
+            const barGraphicCanvases = document.querySelectorAll("canvas.bar1, canvas.bar2, canvas.bar3");
+            const lineGraphicCanvases = document.querySelectorAll("canvas.line1, canvas.line2, canvas.line3");
 
-        const config = {
-            type: 'doughnut',
-            data: data,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Chart.js Doughnut Chart'
+            const { bugday_tarla_sayisi, arpa_tarla_sayisi, domates_tarla_sayisi, bos_tarla_sayisi } = chartsData.urun_tarla_sayilari;
+            // Veri setleri
+            const doughnutData1 = {
+                labels: ['Buğday', 'Arpa', 'Domates', 'Boş'],
+                datasets: [
+                    {
+                        label: 'Tarla Sayısı',
+                        data: [bugday_tarla_sayisi, arpa_tarla_sayisi, domates_tarla_sayisi, bos_tarla_sayisi], // Kendi verilerinizi buraya girin
+                        backgroundColor: Object.values(CHART_COLORS),
                     }
+                ]
+            };
+
+            const bugday_uretim = chartsData.en_yuksek_bugday_uretimi_ay;
+
+            const barData1 = {
+                labels: ['Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim'],
+                datasets: [
+                    {
+                        label: 'En Yüksek Buğday Üretimi (Ton)',
+                        data: [bugday_uretim.mayis, bugday_uretim.haziran, bugday_uretim.temmuz, bugday_uretim.agustos, bugday_uretim.eylul, bugday_uretim.ekim], // Kendi verilerinizi buraya girin
+                        backgroundColor: CHART_COLORS.blue,
+                    },
+                ]
+            };
+
+            const arpa_uretim = chartsData.en_yuksek_arpa_uretimi_ay;
+
+            const barData2 = {
+                labels: ['Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim'],
+                datasets: [
+                    {
+                        label: 'En Yüksek Arpa Üretimi (Ton)',
+                        data: [arpa_uretim.mayis, arpa_uretim.haziran, arpa_uretim.temmuz, arpa_uretim.agustos, arpa_uretim.eylul, arpa_uretim.ekim], // Kendi verilerinizi buraya girin
+                        backgroundColor: CHART_COLORS.orange,
+                    },
+                ]
+            };
+
+            const domates_uretim = chartsData.en_yuksek_arpa_uretimi_ay;
+
+            const barData3 = {
+                labels: ['Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim'],
+                datasets: [
+                    {
+                        label: 'En Yüksek Domates Üretimi (Ton)',
+                        data: [domates_uretim.mayis, domates_uretim.haziran, domates_uretim.temmuz, domates_uretim.agustos, domates_uretim.eylul, domates_uretim.ekim], // Kendi verilerinizi buraya girin
+                        backgroundColor: CHART_COLORS.green,
+                    },
+                ]
+            };
+
+            const bugday_satis_oran = chartsData.bugday_satis_oran;
+
+            const lineData1 = {
+                labels: [2017, 2018, 2019, 2020, 2021],
+                datasets: [
+                    {
+                        label: 'Buğday Satış Miktarı Oranı (Son 5 yıl)',
+                        data: [bugday_satis_oran.mayis, bugday_satis_oran.haziran, bugday_satis_oran.temmuz, bugday_satis_oran.agustos, bugday_satis_oran.eylul, bugday_satis_oran.ekim], // Kendi verilerinizi buraya girin
+                        borderColor: CHART_COLORS.green,
+                        fill: false,
+                    },
+                ]
+            };
+
+            const arpa_satis_oran = chartsData.arpa_satis_oran;
+
+            const lineData2 = {
+                labels: [2017, 2018, 2019, 2020, 2021],
+                datasets: [
+                    {
+                        label: 'Arpa Satış Miktarı Oranı (Son 5 yıl)',
+                        data: [arpa_satis_oran.mayis, arpa_satis_oran.haziran, arpa_satis_oran.temmuz, arpa_satis_oran.agustos, arpa_satis_oran.eylul, arpa_satis_oran.ekim], // Kendi verilerinizi buraya girin
+                        borderColor: CHART_COLORS.blue,
+                        fill: false,
+                    },
+                ]
+            };
+
+            const domates_satis_oran = chartsData.domates_satis_oran;
+
+            const lineData3 = {
+                labels: [2017, 2018, 2019, 2020, 2021],
+                datasets: [
+                    {
+                        label: 'Domates Satış Miktarı Oranı (Son 5 yıl)',
+                        data: [domates_satis_oran.mayis, domates_satis_oran.haziran, domates_satis_oran.temmuz, domates_satis_oran.agustos, domates_satis_oran.eylul, domates_satis_oran.ekim], // Kendi verilerinizi buraya girin
+                        borderColor: CHART_COLORS.orange,
+                        fill: false,
+                    },
+                ]
+            };
+
+            // Konfigürasyonlar
+            const doughnutConfig1 = {
+                type: 'doughnut',
+                data: doughnutData1,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Ürünlere Göre Tarla Sayıları'
+                        }
+                    },
+                },
+            };
+
+            const barConfig1 = {
+                type: 'bar',
+                data: barData1,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Aylara Göre En Yüksek Buğday Üretimi (Ton)'
+                        }
+                    },
+                },
+            };
+
+            const barConfig2 = {
+                type: 'bar',
+                data: barData2,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Aylara Göre En Yüksek Arpa Üretimi (Ton)'
+                        }
+                    },
+                },
+            };
+
+            const barConfig3 = {
+                type: 'bar',
+                data: barData3,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Aylara Göre En Yüksek Domates Üretimi (Ton)'
+                        }
+                    },
+                },
+            };
+
+            const lineConfig1 = {
+                type: 'line',
+                data: lineData1,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Aylara Göre Buğday Satış Miktarı Oranı (Ton)'
+                        }
+                    },
+                },
+            };
+
+            const lineConfig2 = {
+                type: 'line',
+                data: lineData2,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Aylara Göre Arpa Satış Miktarı Oranı (Ton)'
+                        }
+                    },
+                },
+            };
+
+            const lineConfig3 = {
+                type: 'line',
+                data: lineData3,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Aylara Göre Domates Satış Miktarı Oranı (Ton)'
+                        }
+                    },
+                },
+            };
+
+            // Grafikleri oluştur
+            doughnutGraphicCanvases.forEach(canvas => {
+                new Chart(canvas, Object.assign({}, doughnutConfig1));
+            });
+
+            barGraphicCanvases.forEach((canvas, index) => {
+                let config;
+                if (index === 0) {
+                    config = Object.assign({}, barConfig1);
+                } else if (index === 1) {
+                    config = Object.assign({}, barConfig2);
+                } else {
+                    config = Object.assign({}, barConfig3);
                 }
-            },
-        };
+                new Chart(canvas, config);
+            });
 
-        const chart = new Chart(doughnutGraphicCanvas, config);
+            lineGraphicCanvases.forEach((canvas, index) => {
+                let config;
+                if (index === 0) {
+                    config = Object.assign({}, lineConfig1);
+                } else if (index === 1) {
+                    config = Object.assign({}, lineConfig2);
+                } else {
+                    config = Object.assign({}, lineConfig3);
+                }
+                new Chart(canvas, config);
+            });
 
+        })();
         Array.from(document.querySelectorAll(".dashboard-box")).forEach(box => {
             box.style.backgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`
-        })
-
+        });
     </script>
 
 </body>

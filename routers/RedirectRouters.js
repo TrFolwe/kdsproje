@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const { database, getProductById, getGraphicsBoxDataAll } = require("../database/MySQLDatabase")
+const { database, getGraphicsBoxDataAll, getGraphicsChartsDataAll } = require("../database/MySQLDatabase")
 
 const isAuthMiddleware = (req, res, next) => {
     if (!req.session.isAuthenticated) return res.redirect("/login");
@@ -8,7 +8,6 @@ const isAuthMiddleware = (req, res, next) => {
 }
 
 router.get("/", isAuthMiddleware, (req, res) => {
-    console.log(req.user)
     res.render("veri_girisi", { user: req.session.user });
 });
 
@@ -60,6 +59,15 @@ router.get("/veriler", (req, res) => {
                     res.json(result);
                     connection.destroy();
                 })
+                break;
+            case "product_production":
+                connection.query(`SELECT * FROM uretim_miktari`, async (err, result) => {
+                    res.json(result);
+                    connection.destroy();
+                })
+                break;
+            case "charts_data":
+                res.json(await getGraphicsChartsDataAll())
                 break;
         }
     })

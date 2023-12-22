@@ -20,4 +20,4 @@ app.use("/register", require("./routers/RegisterRouter"))
 app.use("/", require("./routers/RedirectRouters"));
 app.use("/", require("./routers/PostRouters"));
 
-app.listen(process.env.PORT)
+app.listen(process.env.PORT, () => console.log(`Server listening on ${process.env.PORT}`))

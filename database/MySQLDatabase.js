@@ -3,18 +3,22 @@ const mysql = require('mysql2')
 require('dotenv/config')
 const { MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB_NAME, MYSQL_INSTANCE_NAME, DEVELOPER_MODE, DEVELOPER_MYSQL_PASSWORD } = process.env;
 
-const mysqlPool = mysql.createPool({
+const mysqlOptions = {
     host: MYSQL_INSTANCE_NAME,
     user: MYSQL_USER,
-    password: DEVELOPER_MODE ? DEVELOPER_MYSQL_PASSWORD : MYSQL_PASSWORD,
     database: MYSQL_DB_NAME
-})
+}
 
-mysqlPool.getConnection((err, connection) => {
+if (DEVELOPER_MODE) mysqlOptions["password"] = DEVELOPER_MYSQL_PASSWORD;
+
+const mysqlPool = mysql.createPool(mysqlOptions);
+
+mysqlPool.getConnection(async err => {
     if (err) throw err;
     console.log("MySQL Bağlantısı kuruldu");
-    connection.destroy();
 })
+
+
 
 function getProductById(productId) {
     return new Promise((rs, rj) => {
@@ -70,15 +74,186 @@ function getGraphicsBoxDataAll() {
             if (err) return rj(err);
             Object.keys(sqlJson).forEach(key => {
                 connection.query(sqlJson[key], (err, result) => {
-                    dataJson[key] = result[0][key];
+                    dataJson[key] = result[0][key]
                 })
-            })
-            connection.release();
+            });
         })
+
         await wait(300);
         rs(dataJson);
     })
 }
 
-module.exports = { getProductById, getSoilTypeById, getGraphicsBoxDataAll };
+function getGraphicsChartsDataAll() {
+    const dataJson = {};
+    const sqlJson = {
+        urun_tarla_sayilari: `
+        SELECT (SELECT COUNT(tarla.tarla_id) FROM tarla WHERE tarla.urun_id=1)AS bugday_tarla_sayisi,
+        (SELECT COUNT(tarla.tarla_id) FROM tarla WHERE tarla.urun_id=2)AS arpa_tarla_sayisi,
+        (SELECT COUNT(tarla.tarla_id) FROM tarla WHERE tarla.urun_id=3)AS domates_tarla_sayisi,
+        (SELECT COUNT(tarla.tarla_id) FROM tarla WHERE tarla.urun_id IS NULL)AS domates_tarla_sayisi,
+        (SELECT COUNT(tarla.tarla_id) AS bos_tarla_sayisi FROM tarla WHERE tarla.urun_id IS NULL)AS bos_tarla_sayisi`,
+        en_yuksek_bugday_uretimi_ay: `SELECT
+        (SELECT MAX(uretim_miktari.mayis) FROM uretim_miktari WHERE uretim_miktari.urun_id=1) AS 'mayis',
+        (SELECT MAX(uretim_miktari.haziran) FROM uretim_miktari WHERE uretim_miktari.urun_id=1) AS 'haziran',
+        (SELECT MAX(uretim_miktari.temmuz) FROM uretim_miktari WHERE uretim_miktari.urun_id=1) AS 'temmuz',
+        (SELECT MAX(uretim_miktari.agustos) FROM uretim_miktari WHERE uretim_miktari.urun_id=1) AS 'agustos',
+        (SELECT MAX(uretim_miktari.eylul) FROM uretim_miktari WHERE uretim_miktari.urun_id=1) AS 'eylul',
+        (SELECT MAX(uretim_miktari.ekim) FROM uretim_miktari WHERE uretim_miktari.urun_id=1) AS 'ekim'`,
+        en_yuksek_arpa_uretimi_ay: `SELECT
+        (SELECT MAX(uretim_miktari.mayis) FROM uretim_miktari WHERE uretim_miktari.urun_id=2) AS 'mayis',
+        (SELECT MAX(uretim_miktari.haziran) FROM uretim_miktari WHERE uretim_miktari.urun_id=2) AS 'haziran',
+        (SELECT MAX(uretim_miktari.temmuz) FROM uretim_miktari WHERE uretim_miktari.urun_id=2) AS 'temmuz',
+        (SELECT MAX(uretim_miktari.agustos) FROM uretim_miktari WHERE uretim_miktari.urun_id=2) AS 'agustos',
+        (SELECT MAX(uretim_miktari.eylul) FROM uretim_miktari WHERE uretim_miktari.urun_id=2) AS 'eylul',
+        (SELECT MAX(uretim_miktari.ekim) FROM uretim_miktari WHERE uretim_miktari.urun_id=2) AS 'ekim'
+        `,
+        en_yuksek_domates_uretimi_ay: `SELECT
+        (SELECT MAX(uretim_miktari.mayis) FROM uretim_miktari WHERE uretim_miktari.urun_id=3) AS 'mayis',
+        (SELECT MAX(uretim_miktari.haziran) FROM uretim_miktari WHERE uretim_miktari.urun_id=3) AS 'haziran',
+        (SELECT MAX(uretim_miktari.temmuz) FROM uretim_miktari WHERE uretim_miktari.urun_id=3) AS 'temmuz',
+        (SELECT MAX(uretim_miktari.agustos) FROM uretim_miktari WHERE uretim_miktari.urun_id=3) AS 'agustos',
+        (SELECT MAX(uretim_miktari.eylul) FROM uretim_miktari WHERE uretim_miktari.urun_id=3) AS 'eylul',
+        (SELECT MAX(uretim_miktari.ekim) FROM uretim_miktari WHERE uretim_miktari.urun_id=3) AS 'ekim'`,
+        bugday_satis_oran: `SELECT (SELECT ROUND((((SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021)
+        -
+       (SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2017))
+       /
+       (SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'mayis',
+       
+       
+(SELECT ROUND((((SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021)
+        -
+       (SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2017))
+       /
+       (SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'haziran',
+
+
+(SELECT ROUND((((SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021)
+        -
+       (SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2017))
+       /
+       (SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'temmuz',
+       
+
+(SELECT ROUND((((SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021)
+        -
+       (SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2017))
+       /
+       (SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'agustos',
+       
+       
+       
+(SELECT ROUND((((SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021)
+        -
+       (SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2017))
+       /
+       (SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'eylul',
+       
+
+(SELECT ROUND((((SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021)
+        -
+       (SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2017))
+       /
+       (SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=1 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'ekim'`,
+        arpa_satis_oran: `SELECT (SELECT ROUND((((SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021)
+       -
+      (SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2017))
+      /
+      (SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'mayis',
+      
+      
+(SELECT ROUND((((SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021)
+       -
+      (SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2017))
+      /
+      (SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'haziran',
+
+
+(SELECT ROUND((((SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021)
+       -
+      (SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2017))
+      /
+      (SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'temmuz',
+      
+
+(SELECT ROUND((((SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021)
+       -
+      (SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2017))
+      /
+      (SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'agustos',
+      
+      
+      
+(SELECT ROUND((((SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021)
+       -
+      (SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2017))
+      /
+      (SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'eylul',
+      
+
+(SELECT ROUND((((SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021)
+       -
+      (SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2017))
+      /
+      (SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=2 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'ekim'`,
+      domates_satis_oran: `SELECT (SELECT ROUND((((SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021)
+      -
+     (SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2017))
+     /
+     (SELECT satis_miktari.mayis FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'mayis',
+     
+     
+(SELECT ROUND((((SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021)
+      -
+     (SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2017))
+     /
+     (SELECT satis_miktari.haziran FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'haziran',
+
+
+(SELECT ROUND((((SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021)
+      -
+     (SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2017))
+     /
+     (SELECT satis_miktari.temmuz FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'temmuz',
+     
+
+(SELECT ROUND((((SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021)
+      -
+     (SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2017))
+     /
+     (SELECT satis_miktari.agustos FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'agustos',
+     
+     
+     
+(SELECT ROUND((((SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021)
+      -
+     (SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2017))
+     /
+     (SELECT satis_miktari.eylul FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'eylul',
+     
+
+(SELECT ROUND((((SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021)
+      -
+     (SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2017))
+     /
+     (SELECT satis_miktari.ekim FROM satis_miktari WHERE satis_miktari.urun_id=3 AND satis_miktari.yillar=2021))*100)AS sonuc)AS 'ekim'`
+    };
+
+    return new Promise(async (rs, rj) => {
+        mysqlPool.getConnection((err, connection) => {
+            Object.keys(sqlJson).forEach(sqlKey => {
+                connection.query(sqlJson[sqlKey], (err, result) => {
+                    dataJson[sqlKey] = result[0];
+                    connection.release();
+                })
+            })
+        })
+
+        await wait(300);
+        rs(dataJson);
+    })
+}
+
+module.exports = { getProductById, getSoilTypeById, getGraphicsBoxDataAll, getGraphicsChartsDataAll };
 module.exports.database = mysqlPool;
